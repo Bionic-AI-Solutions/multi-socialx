@@ -1,0 +1,18 @@
+# ExternalName bridge so the socialx Ingress can target the
+# oauth2-proxy that lives in the auth-proxy namespace.
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-proxy-socialx
+  namespace: socialx
+  labels:
+    component: oauth2-proxy-extname
+spec:
+  type: ExternalName
+  externalName: oauth2-proxy-socialx.auth-proxy.svc.cluster.local
+  sessionAffinity: None
+  ports:
+    - name: http
+      port: 4180
+      protocol: TCP
+      targetPort: 4180

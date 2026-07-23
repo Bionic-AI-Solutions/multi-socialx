@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: socialx
+  labels:
+    app.kubernetes.io/name: socialx
+    app.kubernetes.io/part-of: multi-socialx

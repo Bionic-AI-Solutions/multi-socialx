@@ -1,11 +1,10 @@
+import { loadVaultConfig } from '@gitroom/helpers/configuration/load-vault-config';
 import { initializeSentry } from '@gitroom/nestjs-libraries/sentry/initialize.sentry';
-initializeSentry('backend', true);
 import compression from 'compression';
 
 import { loadSwagger } from '@gitroom/helpers/swagger/load.swagger';
 import { json } from 'express';
 import { Runtime } from '@temporalio/worker';
-Runtime.install({ shutdownSignals: [] });
 
 process.env.TZ = 'UTC';
 
@@ -21,6 +20,17 @@ import { ConfigurationChecker } from '@gitroom/helpers/configuration/configurati
 import { startMcp } from '@gitroom/nestjs-libraries/chat/start.mcp';
 
 async function start() {
+  const vault = await loadVaultConfig();
+  if (vault.loaded) {
+    Logger.log(
+      `Loaded ${vault.keysApplied.length} keys from ${vault.path}`,
+      'Vault'
+    );
+  }
+
+  initializeSentry('backend', true);
+  Runtime.install({ shutdownSignals: [] });
+
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
     cors: {

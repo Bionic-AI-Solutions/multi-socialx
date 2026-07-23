@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: socialx-uploads
+  namespace: socialx
+  labels:
+    app.kubernetes.io/name: socialx
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ceph-rbd-fast
+  resources:
+    requests:
+      storage: 20Gi

@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: socialx
+  namespace: socialx
+  labels:
+    app: socialx
+    app.kubernetes.io/name: socialx
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: socialx
+  template:
+    metadata:
+      labels:
+        app: socialx
+        app.kubernetes.io/name: socialx
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-pull-secret
+      containers:
+        - name: socialx
+          image: docker.io/docker4zerocool/socialx:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: socialx-config
+            - secretRef:
+                name: socialx-secrets
+          env:
+            # In-pod backend URL (nginx proxies /api → :3000)
+            - name: BACKEND_INTERNAL_URL
+              value: http://127.0.0.1:3000
+            - name: TEMPORAL_ADDRESS
+              value: socialx-temporal.socialx.svc.cluster.local:7233
+            # Guard against oversized Cookie/Authorization from the gateway.
+            - name: NODE_OPTIONS
+              value: --max-http-header-size=65536
+          volumeMounts:
+            - name: uploads
+              mountPath: /uploads
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 90
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 6Gi
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: socialx-uploads
+        - name: nginx-config
+          configMap:
+            name: socialx-nginx
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: socialx
+  namespace: socialx
+  labels:
+    app: socialx
+spec:
+  selector:
+    app: socialx
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

@@ -5,6 +5,8 @@ dist
 tmp
 /out-tsc
 .env
+google.json
+**/google.json
 # dependencies
 node_modules
 

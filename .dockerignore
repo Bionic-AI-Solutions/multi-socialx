@@ -21,3 +21,7 @@ dist
 .git
 .github
 reports
+.env
+.env.*
+!.env.example
+k8s

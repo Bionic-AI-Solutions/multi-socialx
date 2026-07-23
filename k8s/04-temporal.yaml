@@ -1,0 +1,147 @@
+# Temporal dependencies + server for Postiz orchestrator workflows.
+# Postgres for Temporal lives on shared pg-ceph. Create the
+# socialx-temporal-db Secret via k8s/deploy.sh before applying this file.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: socialx-temporal-es
+  namespace: socialx
+  labels:
+    app: socialx-temporal-es
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socialx-temporal-es
+  template:
+    metadata:
+      labels:
+        app: socialx-temporal-es
+    spec:
+      containers:
+        - name: elasticsearch
+          image: elasticsearch:7.17.27
+          env:
+            - name: discovery.type
+              value: single-node
+            - name: ES_JAVA_OPTS
+              value: -Xms256m -Xmx256m
+            - name: xpack.security.enabled
+              value: "false"
+            - name: cluster.routing.allocation.disk.threshold_enabled
+              value: "true"
+            - name: cluster.routing.allocation.disk.watermark.low
+              value: 512mb
+            - name: cluster.routing.allocation.disk.watermark.high
+              value: 256mb
+            - name: cluster.routing.allocation.disk.watermark.flood_stage
+              value: 128mb
+          ports:
+            - containerPort: 9200
+              name: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: socialx-temporal-es
+  namespace: socialx
+spec:
+  selector:
+    app: socialx-temporal-es
+  ports:
+    - name: http
+      port: 9200
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: socialx-temporal
+  namespace: socialx
+  labels:
+    app: socialx-temporal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socialx-temporal
+  template:
+    metadata:
+      labels:
+        app: socialx-temporal
+    spec:
+      containers:
+        - name: temporal
+          image: temporalio/auto-setup:1.28.1
+          env:
+            - name: DB
+              value: postgres12
+            - name: DB_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: socialx-temporal-db
+                  key: POSTGRES_USER
+            - name: POSTGRES_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: socialx-temporal-db
+                  key: POSTGRES_PWD
+            - name: POSTGRES_SEEDS
+              valueFrom:
+                secretKeyRef:
+                  name: socialx-temporal-db
+                  key: POSTGRES_SEEDS
+            - name: ENABLE_ES
+              value: "true"
+            - name: ES_SEEDS
+              value: socialx-temporal-es
+            - name: ES_VERSION
+              value: v7
+            - name: TEMPORAL_NAMESPACE
+              value: default
+            - name: DYNAMIC_CONFIG_FILE_PATH
+              value: config/dynamicconfig/development-sql.yaml
+          ports:
+            - containerPort: 7233
+              name: rpc
+          volumeMounts:
+            - name: dynamicconfig
+              mountPath: /etc/temporal/config/dynamicconfig
+          readinessProbe:
+            tcpSocket:
+              port: rpc
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+      volumes:
+        - name: dynamicconfig
+          configMap:
+            name: temporal-dynamicconfig
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: socialx-temporal
+  namespace: socialx
+spec:
+  selector:
+    app: socialx-temporal
+  ports:
+    - name: rpc
+      port: 7233
+      targetPort: rpc

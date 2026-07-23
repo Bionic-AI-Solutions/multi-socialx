@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: socialx
+  namespace: socialx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    konghq.com/protocols: http,https
+    konghq.com/strip-path: "false"
+    konghq.com/preserve-host: "true"
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+        - socialx.baisoln.com
+      secretName: socialx-baisoln-com-tls
+  rules:
+    - host: socialx.baisoln.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy-socialx
+                port:
+                  number: 4180
