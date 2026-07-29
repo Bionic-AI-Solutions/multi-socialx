@@ -49,21 +49,25 @@ spec:
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
               readOnly: true
+          # Probe through nginx's /api/ location (proxies to the backend on
+          # :3000) rather than / (which only proves nginx + the frontend are
+          # up). A backend that fails to listen must fail the pod, not sit
+          # Ready while every API call gets connection refused.
           startupProbe:
             httpGet:
-              path: /
+              path: /api/
               port: http
             failureThreshold: 90
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/
               port: http
             initialDelaySeconds: 120
             periodSeconds: 30

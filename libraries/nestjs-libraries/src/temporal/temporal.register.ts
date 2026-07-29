@@ -1,6 +1,15 @@
-import { Global, Injectable, Module, OnModuleInit } from '@nestjs/common';
+import {
+  Global,
+  Injectable,
+  Logger,
+  Module,
+  OnModuleInit,
+} from '@nestjs/common';
 import { TemporalService } from 'nestjs-temporal-core';
 import { Connection } from '@temporalio/client';
+
+const CONNECT_ATTEMPTS = 60;
+const CONNECT_DELAY_MS = 10000;
 
 @Injectable()
 export class TemporalRegister implements OnModuleInit {
@@ -13,10 +22,14 @@ export class TemporalRegister implements OnModuleInit {
     const connection = this._client?.client?.getRawClient()
       ?.connection as Connection;
 
-    const { customAttributes } =
-      await connection.operatorService.listSearchAttributes({
+    // On a cold start Temporal can take several minutes to accept connections
+    // (it waits on its own Elasticsearch). Retry instead of throwing, otherwise
+    // the whole backend never gets to app.listen().
+    const { customAttributes } = await this.connectWithRetry(() =>
+      connection.operatorService.listSearchAttributes({
         namespace: process.env.TEMPORAL_NAMESPACE || 'default',
-      });
+      })
+    );
 
     const neededAttribute = ['organizationId', 'postId'];
     const missingAttributes = neededAttribute.filter(
@@ -32,6 +45,25 @@ export class TemporalRegister implements OnModuleInit {
           return all;
         }, {}),
       });
+    }
+  }
+
+  private async connectWithRetry<T>(operation: () => Promise<T>): Promise<T> {
+    for (let attempt = 1; ; attempt++) {
+      try {
+        return await operation();
+      } catch (err) {
+        if (attempt >= CONNECT_ATTEMPTS) {
+          throw err;
+        }
+
+        Logger.warn(
+          `Temporal is not reachable yet (attempt ${attempt}/${CONNECT_ATTEMPTS}), retrying in ${CONNECT_DELAY_MS}ms`,
+          'TemporalRegister'
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, CONNECT_DELAY_MS));
+      }
     }
   }
 }
