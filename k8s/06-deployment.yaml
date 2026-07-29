@@ -23,8 +23,11 @@ spec:
         - name: dockerhub-pull-secret
       containers:
         - name: socialx
-          image: docker.io/docker4zerocool/socialx:latest
-          imagePullPolicy: Always
+          # Pinned deliberately. A floating :latest means an unrelated image
+          # push silently changes what production runs on the next restart.
+          # Bump this tag to roll forward; the previous tag is the rollback.
+          image: docker.io/docker4zerocool/socialx:v0.1.3
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 5000
@@ -49,21 +52,25 @@ spec:
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
               readOnly: true
+          # Probe through nginx's /api/ location (proxies to the backend on
+          # :3000) rather than / (which only proves nginx + the frontend are
+          # up). A backend that fails to listen must fail the pod, not sit
+          # Ready while every API call gets connection refused.
           startupProbe:
             httpGet:
-              path: /
+              path: /api/
               port: http
             failureThreshold: 90
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /
+              path: /api/
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /
+              path: /api/
               port: http
             initialDelaySeconds: 120
             periodSeconds: 30

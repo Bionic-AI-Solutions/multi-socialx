@@ -89,6 +89,10 @@ async function start() {
     Logger.log(`🚀 Backend is running on: http://localhost:${port}`);
   } catch (e) {
     Logger.error(`Backend failed to start on port ${port}`, e);
+    // Nothing is listening at this point, so the process is useless. Exit so the
+    // supervisor (PM2 / Kubernetes) restarts it instead of leaving it up and
+    // reporting healthy while every /api request gets connection refused.
+    process.exit(1);
   }
 }
 
