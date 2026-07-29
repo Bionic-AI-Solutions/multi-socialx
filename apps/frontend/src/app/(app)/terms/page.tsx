@@ -12,12 +12,16 @@ export const metadata: Metadata = {
 
 export default async function Terms() {
   return (
-    <LegalPage title="Terms of Service" lastUpdated="29 July 2026">
+    <LegalPage
+      title="Terms of Service"
+      lastUpdated="29 July 2026"
+      pending={false}
+    >
       <LegalSection heading="1. Who provides the Service">
         <p>
           Bionic (the &quot;Service&quot;) is operated by{' '}
-          <strong>[LEGAL ENTITY NAME]</strong>, registered at{' '}
-          <strong>[REGISTERED ADDRESS]</strong> (&quot;we&quot;,
+          <strong>Bionic AI Solutions</strong>, registered at{' '}
+          <strong>3403 West Lake Sammamish Pkwy SE, Bellevue, WA 98008, USA</strong> (&quot;we&quot;,
           &quot;us&quot;). These Terms govern your use of the Service.
         </p>
       </LegalSection>
@@ -150,7 +154,7 @@ export default async function Terms() {
           To the maximum extent permitted by law, our total liability arising
           out of or relating to the Service is limited to the greater of (a) the
           fees you paid in the 12 months preceding the claim, or (b){' '}
-          <strong>[LIABILITY CAP]</strong>. We are not liable for indirect,
+          <strong>USD 100</strong>. We are not liable for indirect,
           incidental or consequential damages, or for lost profits or data.
         </p>
       </LegalSection>
@@ -188,7 +192,7 @@ export default async function Terms() {
       <LegalSection heading="20. Governing law and disputes">
         <p>
           These Terms are governed by the laws of{' '}
-          <strong>[GOVERNING JURISDICTION]</strong>, and its courts have
+          <strong>the State of Washington, USA</strong>, and its courts have
           exclusive jurisdiction, except that we may bring proceedings for
           intellectual property infringement in any competent court.
         </p>
@@ -205,7 +209,7 @@ export default async function Terms() {
       <LegalSection heading="22. Contact">
         <p>
           Questions about these Terms can be sent to{' '}
-          <strong>[CONTACT EMAIL]</strong>.
+          <strong>legal@baisoln.com</strong>.
         </p>
       </LegalSection>
     </LegalPage>
