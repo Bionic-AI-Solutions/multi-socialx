@@ -47,7 +47,12 @@ export async function proxy(request: NextRequest) {
     nextUrl.pathname.startsWith('/uploads/') ||
     nextUrl.pathname.startsWith('/p/') ||
     nextUrl.pathname.startsWith('/provider/') ||
-    nextUrl.pathname.startsWith('/icons/')
+    nextUrl.pathname.startsWith('/icons/') ||
+    // The registration form links to these, so they have to be readable
+    // before the user has an account. Without this they redirect to /auth
+    // and nobody can read what they are agreeing to.
+    nextUrl.pathname === '/terms' ||
+    nextUrl.pathname === '/privacy'
   ) {
     return topResponse;
   }
