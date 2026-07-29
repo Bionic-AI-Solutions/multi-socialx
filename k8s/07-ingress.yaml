@@ -4,7 +4,12 @@ metadata:
   name: socialx
   namespace: socialx
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # DNS-01, not HTTP-01. socialx.baisoln.com resolves to 192.168.0.210 (a
+    # private MetalLB address, DNS-only rather than Cloudflare-proxied like
+    # the other baisoln hosts), so Let's Encrypt rejects it for HTTP-01 with
+    # "no valid A records". DNS-01 validates via a TXT record instead and
+    # does not require the host to be publicly reachable.
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
     konghq.com/protocols: http,https
     konghq.com/strip-path: "false"
     konghq.com/preserve-host: "true"
