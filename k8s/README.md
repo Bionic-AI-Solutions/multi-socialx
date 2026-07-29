@@ -18,7 +18,7 @@ real ones (the infra copy holds only the ExternalSecret).
 | Vault path | `secret/t6-apps/socialx/config` |
 | Auth | Keycloak Bionic → oauth2-proxy-socialx (`socialx-access`) |
 | Google IdP | `secret/t5-gateway/keycloak/google` + setup-google.sh |
-| Image | `docker.io/docker4zerocool/socialx:v0.1.6` (pinned, not `:latest`) |
+| Image | `docker.io/docker4zerocool/socialx:v0.1.7` (pinned, not `:latest`) |
 | URL | https://socialx.baisoln.com |
 
 ## State that lives outside this namespace

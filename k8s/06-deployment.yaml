@@ -26,7 +26,7 @@ spec:
           # Pinned deliberately. A floating :latest means an unrelated image
           # push silently changes what production runs on the next restart.
           # Bump this tag to roll forward; the previous tag is the rollback.
-          image: docker.io/docker4zerocool/socialx:v0.1.6
+          image: docker.io/docker4zerocool/socialx:v0.1.7
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
