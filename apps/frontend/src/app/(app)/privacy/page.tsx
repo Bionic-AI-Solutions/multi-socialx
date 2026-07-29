@@ -12,12 +12,16 @@ export const metadata: Metadata = {
 
 export default async function Privacy() {
   return (
-    <LegalPage title="Privacy Policy" lastUpdated="29 July 2026">
+    <LegalPage
+      title="Privacy Policy"
+      lastUpdated="29 July 2026"
+      pending={false}
+    >
       <LegalSection heading="1. Who we are">
         <p>
           Bionic (the &quot;Service&quot;) is operated by{' '}
-          <strong>[LEGAL ENTITY NAME]</strong>, registered at{' '}
-          <strong>[REGISTERED ADDRESS]</strong>, which is the data controller
+          <strong>Bionic AI Solutions</strong>, registered at{' '}
+          <strong>3403 West Lake Sammamish Pkwy SE, Bellevue, WA 98008, USA</strong>, which is the data controller
           for the personal data described in this policy.
         </p>
       </LegalSection>
@@ -123,10 +127,23 @@ export default async function Privacy() {
 
       <LegalSection heading="12. Regional rights">
         <p>
-          Residents of certain regions have additional rights under local law
-          (for example the GDPR in the EU and UK, and the CCPA/CPRA in
-          California). Applicable regimes for this Service:{' '}
-          <strong>[APPLICABLE PRIVACY REGIMES]</strong>.
+          Residents of certain regions have additional rights under local law.
+          The regimes we recognise for this Service are the{' '}
+          <strong>CCPA/CPRA</strong> for California residents and the{' '}
+          <strong>DPDP Act</strong> for residents of India.
+        </p>
+        <p>
+          Under the CCPA/CPRA, California residents may request disclosure of
+          the categories and specific pieces of personal information collected,
+          request deletion or correction, and opt out of any sale or sharing of
+          personal information. We do not sell personal data. You will not be
+          discriminated against for exercising these rights.
+        </p>
+        <p>
+          Under the DPDP Act, residents of India may request access to and
+          correction or erasure of their personal data, nominate another person
+          to exercise their rights, and raise a grievance with us before
+          escalating to the Data Protection Board.
         </p>
       </LegalSection>
 
@@ -163,7 +180,7 @@ export default async function Privacy() {
       <LegalSection heading="17. Contact us">
         <p>
           Privacy questions and rights requests can be sent to{' '}
-          <strong>[CONTACT EMAIL]</strong>.
+          <strong>legal@baisoln.com</strong>.
         </p>
       </LegalSection>
     </LegalPage>
