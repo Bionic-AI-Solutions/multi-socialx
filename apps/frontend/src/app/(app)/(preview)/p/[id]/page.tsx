@@ -2,8 +2,7 @@ import { internalFetch } from '@gitroom/helpers/utils/internal.fetch';
 import { sanitizePostContent } from '@gitroom/helpers/utils/sanitize.post.content';
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
-import { isGeneralServerSide } from '@gitroom/helpers/utils/is.general.server.side';
-import SafeImage from '@gitroom/react/helpers/safe.image';
+import { Logo } from '@gitroom/frontend/components/new-layout/logo';
 import Link from 'next/link';
 import { CommentsComponents } from '@gitroom/frontend/components/preview/comments.components';
 import dayjs from 'dayjs';
@@ -16,7 +15,7 @@ import { CreationMethodBadge } from '@gitroom/frontend/components/launches/creat
 
 dayjs.extend(utc);
 export const metadata: Metadata = {
-  title: `${isGeneralServerSide() ? 'Postiz' : 'Gitroom'} Preview`,
+  title: 'Bionic Preview',
   description: '',
 };
 export default async function Auth(
@@ -57,12 +56,7 @@ export default async function Auth(
                   className="text-2xl flex items-center justify-center gap-[10px] text-textColor order-1"
                 >
                   <div className="max-w-[55px]">
-                    <SafeImage
-                      src={'/postiz.svg'}
-                      width={55}
-                      height={55}
-                      alt="Logo"
-                    />
+                    <Logo />
                   </div>
                   <div>
                     <svg
