@@ -6,6 +6,10 @@ metadata:
   labels:
     app: socialx
     app.kubernetes.io/name: socialx
+  annotations:
+    # Reloader rolling-restarts this deployment whenever socialx-secrets
+    # changes, so Vault edits land without a manual rollout.
+    secret.reloader.stakater.com/reload: "socialx-secrets"
 spec:
   replicas: 1
   strategy:
@@ -40,6 +44,10 @@ spec:
             # In-pod backend URL (nginx proxies /api → :3000)
             - name: BACKEND_INTERNAL_URL
               value: http://127.0.0.1:3000
+            # All config comes from ESO-synced env vars; skip the app's own
+            # runtime Vault load (was set live via kubectl set env).
+            - name: VAULT_SKIP_LOAD
+              value: "true"
             - name: TEMPORAL_ADDRESS
               value: socialx-temporal.socialx.svc.cluster.local:7233
             # Guard against oversized Cookie/Authorization from the gateway.
